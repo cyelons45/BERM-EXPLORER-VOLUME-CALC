@@ -1,6 +1,10 @@
 function graphSlidedown() {
     $(document).ready(function() {
+        // $('#chart-main').removeClass('chart')
+        // $('#chart-main').addClass('chart-active')
         $('.chart').slideUp(1000)
+            // $('.chart').css('display', 'block')
+
 
     })
 }
@@ -8,7 +12,11 @@ function graphSlidedown() {
 
 function graphSlideUp() {
     $(document).ready(function() {
+        // $('#chart-main').removeClass('chart')
+        // $('#chart-main').addClass('chart-active')
         $('.chart').slideDown(1000)
+            // $('.chart').css('display', 'block')
+
 
     })
 }
@@ -16,7 +24,9 @@ function graphSlideUp() {
 
 function togglegraph() {
     $(document).ready(function() {
-        $('.chart').slideToggle(1000)
+        // $('#chart-main').removeClass('chart')
+        $('#chart-main').addClass('chart-active')
+        $('.chart-active ').slideToggle(1000)
 
     })
 }

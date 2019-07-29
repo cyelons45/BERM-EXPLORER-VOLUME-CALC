@@ -1,4 +1,4 @@
-var map, view, graphicsLayer, activeGraphic, graphicsLayerLine
+var map, view, graphicsLayer, activeGraphic, graphicsLayerLine, layer_1, layer_2, layer_3, layerList, legend, state, active_transact
 require([
     "esri/Map",
     "esri/views/MapView",
@@ -30,11 +30,8 @@ require([
 
     view.ui.add(basemapToggle, "top-right");
 
-    var legend = new Legend({
-        view: view
-    });
 
-    view.ui.add(legend, "bottom-right");
+    state = []
 
     var beachPoints = new FeatureLayer({
         url: `https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/5`,
@@ -42,174 +39,151 @@ require([
     });
     map.add(beachPoints);
 
+    // 'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/6'
+
+
+    let selected_2014_Layers = [
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/1', //overLcontig
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/3', //gaps
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/2', //transact
+
+    ]
+
+    let selected_2015_Layers = [
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/7', //overLcontig
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/9', //gaps
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/8', //transact
+
+    ]
+
+    let selected_2016_Layers = [
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/12', //overLcontig
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/14', //gaps
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/13', //transact
+
+    ]
+
+    let selected_2017_Layers = [
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/16', //overLcontig
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/18', //gaps
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/17', //transact
+
+    ]
+
+    let selected_2018_Layers = [
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/20', //overLcontig
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/22', //gaps
+        'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/21', //transact
+    ]
+
+    // let selected_2019_Layers = [
+    //     'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/7',//overLcontig
+    //     'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/9',//gaps
+    //     'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/8',//transact
+
+    // ]
+
+    layerList = [layer_1, layer_2, layer_3]
+
+    drawLayers(selected_2014_Layers)
+    document.querySelector('.year-2014').style.background = '#F05C5A';
+
+    function drawLayers(year) {
+        for (let i = 0; i < 3; i++) {
+            layerList[i] = new FeatureLayer({
+                url: year[i],
+                outFields: '*'
+            });
+            map.add(layerList[i]);
+        }
+
+
+        if (!legend) {
+            legend = new Legend({
+                view: view
+            });
+            view.ui.add(legend, "bottom-right");
+
+        } else {
+            view.ui.remove(legend);
+            legend = new Legend({
+                view: view
+            });
+            view.ui.add(legend, "bottom-right");
+
+        }
+
+    }
+
 
     view.on("click", function(event) {
 
         view.hitTest(event).then(function(response) {
-            // console.log(response)
+
             if (response.results.length) {
                 var graphic = response.results.filter(function(result) {
 
-                    // check if the graphic belongs to the layer of interest
-                    return result.graphic.layer === beachPoints;
+                    return result.graphic.layer === beachPoints || result.graphic.layer === layerList[2];
                 })[0].graphic;
 
-                view.whenLayerView(graphic.layer).then(function(layerView) {
 
-                        // if (highlight) {
-                        //     highlight.remove();
-                        // }
-                        // highlight = layerView.highlight(graphic);
+                let list = graphic.attributes['NAME'] || graphic.attributes['TRAN_ID'];
+
+                if (list = graphic.attributes['NAME']) {
+
+                    view.whenLayerView(graphic.layer).then(function(layerView) {
+
                         graphicsLayer.removeAll()
 
                     })
-                    // console.log(graphic);
-                var search = new ProcessBerm()
-
-                let list = graphic.attributes['NAME'];
-                var newquery = search.createQuery(list)
-
-                newquery.queryTask.execute(newquery.query).then(function(results) {
-                    // console.log(results)
-                    search.addPolygonGraphics(results)
-                        // search.addGraphic(results)
-                });
-
-            }
-        });
-    });
-
-
-
-
-    var transact2015 = new FeatureLayer({
-        url: 'https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/8',
-        outFields: '*'
-    });
-    map.add(transact2015);
-    view.on("click", function(event) {
-
-
-
-        view.hitTest(event).then(function(response) {
-            // console.log(response)
-            if (response.results.length) {
-                var graphic = response.results.filter(function(result) {
-
-                    // check if the graphic belongs to the layer of interest
-                    return result.graphic.layer === transact2015;
-                })[0].graphic;
-                var search = new ProcessBerm()
-                    // console.log(graphic)
-                let list = graphic.attributes['TRAN_ID'];
-                var newquery = search.createTransactQuery(list)
-                    // console.log(list)
-                newquery.tranqueryTask.execute(newquery.tranquery).then(function(results) {
-                    console.log(results.features[0].attributes)
-                    console.log(results.features)
                     if (graphicsLayerLine) {
                         graphicsLayerLine.removeAll()
                     }
 
-                    graphicsLayerLine = new GraphicsLayer();
 
-                    map.add(graphicsLayerLine);
+                    var search = new ProcessBerm()
 
-                    search.addLineGraphics(results, graphicsLayerLine)
-                        // SlideDownVolumeBtn()
-                        // console.log(close__btn)
+                    var newquery = search.createQuery(list)
+
+                    newquery.queryTask.execute(newquery.query).then(function(results) {
+
+                        search.addPolygonGraphics(results)
+
+                    });
+                } else if (list = graphic.attributes['TRAN_ID']) {
                     graphSlideUp()
+                    state.active_transact = list
 
-                    // search.addGraphic(results)
+                    if (graphicsLayerLine) {
+                        graphicsLayerLine.removeAll()
+                    }
 
-                });
+                    active_transact(list)
+                }
 
             }
         });
     });
 
 
+    active_transact = function(list) {
+        var search = new ProcessBerm()
+        var newtranquery = search.createTransactQuery(list)
 
 
-    // })
+        newtranquery.tranqueryTask.execute(newtranquery.tranquery).then(function(results) {
 
+            search.addLineGraphics(results)
 
-
-
-
-    let t = document.querySelector('.nav').addEventListener('click', function(e) {
-        let list = e.target.closest('.b-list')
-        let down = e.target.closest('.b-down')
-        let print = e.target.closest('#print')
-        if (list) {
-            var search = new ProcessBerm()
-            var newquery = search.createQuery(list.innerHTML)
-
-            // console.log(newquery)
-
-            // function addGraphics(result) {
-            // graphicsLayer.removeAll();
-            // if (highlight) {
-            //     highlight.remove();
-            // }
-            if (graphicsLayer) {
-                graphicsLayer.removeAll();
-            }
-
-            newquery.queryTask.execute(newquery.query).then(function(results) {
-
-                search.addPolygonGraphics(results)
-
-            });
-
-        } else if (down) {
-
-        } else if (print) {
-
-            // let chrt = document.getElementById('toggle-chart').classList.toggle('close-chart')
-
-            // console.log(chrt)
-
-        }
-
-
-    })
+        });
+    }
 
 
 
     view.on("pointer-move", function(event) {
         let search = new ProcessBerm()
-            // search.findNearestGraphic(event) 
-        search.findNearestGraphic(event).then(function(graphic) {
-            if (graphic) {
-                activeGraphic = graphic;
-                $(graphic).ready(function() {
-                    $('#viewDiv').css('cursor', 'pointer')
-                })
-
-            }
-        });
+        search.findNearestGraphic(event)
     });
-
-    var activeGraphic;
-
-    function notOnGraphic(event) {
-        return view.hitTest(event).then(function(response) {
-            //  console.log(response.results.length)
-            if (response.results.length === 0) {
-                $('#viewDiv').css('cursor', 'default')
-            }
-        });
-    }
-
-
-    view.on("pointer-move", function(event) {
-        notOnGraphic(event)
-
-    });
-
-
-
 
 
     class ProcessBerm {
@@ -219,7 +193,8 @@ require([
         createTransactQuery(list) {
 
 
-            var pointUrl = "https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/8";
+
+            var pointUrl = `https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/${layerList[2].layerId}`;
             var tranqueryTask = new QueryTask({
                 url: pointUrl
             });
@@ -266,17 +241,17 @@ require([
 
                 if (response.results.length) {
                     graphic = response.results.filter(function(result) {
-                        return (result.graphic.layer === transact2015 || beachPoints);
+                        return (result.graphic.layer === layerList[2] || beachPoints);
                     })[0].graphic;
                 }
                 if (graphic) {
                     if (!activeGraphic || (activeGraphic.attributes.OBJECTID !== graphic.attributes.OBJECTID)) {
-                        return graphic;
+                        $('#viewDiv').css('cursor', 'pointer')
                     } else {
-                        return null;
+                        $('#viewDiv').css('cursor', 'default')
                     }
                 } else {
-                    return null;
+                    $('#viewDiv').css('cursor', 'default')
                 }
             });
 
@@ -284,11 +259,6 @@ require([
         addPolygonGraphics(results) {
             graphicsLayer = new GraphicsLayer();
             map.add(graphicsLayer);
-
-
-
-            graphicsLayer.removeAll();
-
 
             results.features.forEach(function(feature) {
 
@@ -311,7 +281,9 @@ require([
                 view.goTo(g)
             });
         }
-        addLineGraphics(results, graphicsLayerLine) {
+        addLineGraphics(results) {
+            graphicsLayerLine = new GraphicsLayer();
+            map.add(graphicsLayerLine);
             results.features.forEach(function(feature) {
 
                 var gl = new Graphic({
@@ -320,8 +292,11 @@ require([
                     symbol: {
                         type: "simple-line",
                         paths: feature.geometry.paths,
-                        color: [236, 176, 9, 0.9],
+                        color: [200, 231, 20, 0.5],
                         width: 12,
+
+
+
 
 
                     },
@@ -334,84 +309,49 @@ require([
             });
         }
 
-
-        // }
-
-
-
     }
 
 
+    let t = document.querySelector('.nav').addEventListener('click', function(e) {
+        let list = e.target.closest('.b-list')
+        let down = e.target.closest('.b-down')
+        let print = e.target.closest('#print')
+        if (list) {
+            var search = new ProcessBerm()
+            var newquery = search.createQuery(list.innerHTML)
 
-
-
-
-
-    function findNearestGraphic(event) {
-        return view.hitTest(event).then(function(response) {
-            var graphic;
-            if (graphic) {
-                if (!activeGraphic || (activeGraphic.attributes.OBJECTID !== graphic.attributes.OBJECTID)) {
-                    return graphic;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
+            if (graphicsLayer || graphicsLayerLine) {
+                graphicsLayer.removeAll();
+                graphicsLayerLine.removeAll()
             }
-        });
-    }
-
-
-    view.on("pointer-move", function(event) {
-        findNearestGraphic(event).then(function(graphic) {
-            if (graphic) {
-                activeGraphic = graphic;
-
-            }
-        });
-    });
 
 
 
 
-    // ------------------------------------------------------------------------------------------------------------------------
-    // var pointUrl = "https://giswebtest.dhec.sc.gov/arcgis/rest/services/environment/BERM16A/MapServer/4";
-    // var queryTask = new QueryTask({
-    //   url: pointUrl
-    // });
-    //
-    // // `TRL_NAME ='${list.innerHTML}'`;
-    // var sql = "NAME='Edisto Beach'";
-    // var query = new Query();
-    // query.returnGeometry = true;
-    // query.outFields = ["*"];
-    // query.where =sql
-    // queryTask.execute(query).then(function(results){
-    //   // addGraphics(results)
-    //   console.log(results);
-    //
-    // });
+            newquery.queryTask.execute(newquery.query).then(function(results) {
 
-    // -----------------------------------------------------------------------------------------------------------------
+                search.addPolygonGraphics(results)
+
+            });
+
+        } else if (down) {
+
+        } else if (print) {
+
+            // let chrt = document.getElementById('toggle-chart').classList.toggle('close-chart')
+
+            // console.log(chrt)
+
+        }
 
 
-
-    // document.querySelector('.btn__calculator').addEventListener('click', function() {
-    //     toggleVolumeBtn()
-    // })
+    })
 
 
-
-    // document.querySelector('.btn__close').addEventListener('click', function() {
-
-    //     togglegraph()
-    // })
 
 
 
     document.querySelector('.chart-head').addEventListener('click', function(e) {
-        // console.log(e.target.closest('.btn__year').classList[1].split('-')[1])
         let close__btn = e.target.closest('.btn__close');
         let volume__calculator_btn = e.target.closest('.btn__calculator');
         let year__selection = e.target.closest('.btn__year');
@@ -421,7 +361,92 @@ require([
 
             })
             document.querySelector(`.${year__selection.classList[1]}`).style.background = '#F05C5A';
-            console.log(selected__year = year__selection.classList[1].split('-')[1])
+            let Year = selected__year = year__selection.classList[1].split('-')[1]
+            if (Year === '2014') {
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                drawLayers(selected_2014_Layers)
+                active_transact(state.active_transact)
+
+            } else if (Year === '2015') {
+
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                drawLayers(selected_2015_Layers)
+                active_transact(state.active_transact)
+
+            } else if (Year === '2016') {
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                drawLayers(selected_2016_Layers)
+                active_transact(state.active_transact)
+
+            } else if (Year === '2017') {
+
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                drawLayers(selected_2017_Layers)
+                active_transact(state.active_transact)
+
+            } else if (Year === '2018') {
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                drawLayers(selected_2018_Layers)
+                active_transact(state.active_transact)
+
+            } else if (Year === '2019') {
+                layerList.forEach(function(el) {
+                    map.remove(el)
+
+                })
+
+                if (graphicsLayerLine) {
+                    graphicsLayerLine.removeAll()
+                }
+
+                // active_transact(state.active_transact)
+
+
+
+
+            }
+
+
+
         } else if (volume__calculator_btn) {
             volume__calculator_btn.classList.toggle('btn__calculator-active')
             toggleVolumeBtn()
