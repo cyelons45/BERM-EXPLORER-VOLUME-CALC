@@ -94,11 +94,87 @@
         <section class="map__area">
             <div id="viewDiv">
                 <div class="dhec__logo">
+                    <!-- <img src="img/dhec_logo.png" alt="dhec-logo"> -->
                     <img src="img/logo_white--1.png" alt="dhec-logo">
 
                 </div>
                 <div class="volume__calculator">
+                    <div class="vol">
+                        <p class="vol__head">Volume Calculator<span> >>  Instructions</span></p>
+                        <!-- <p class="vol__instructions"></p> sp -->
 
+                    </div>
+
+                    <!-- <div class="main-panel"> -->
+
+
+                    <!-- <div class="contour-box"> -->
+                    <!-- <fieldset> -->
+                    <!-- <legend>Select Contour: </legend> -->
+                    <!-- <div class="upper-box">
+                                <input type="radio" name="radio-1" id="radio-1" selected="selected">
+                                <label for="radio-1">Upper Contour(Landward)</label>
+                            </div>
+                            <div class="lower-box">
+                                <input type="radio" name="radio-1" id="radio-2">
+                                <label for="radio-2">Lower Contour(Seaward)</label>
+                            </div> -->
+                    <div class="form__group">
+                        <div class="form__radio-group">
+                            <input type="radio" class="form__radio-input" id="small" name="size" checked>
+
+                            <label for="small" class="form__radio-label">
+                                        <span class="form__radio-button upper"></span>
+                                        Upper Contour<br> <span class="direction">(Landward)</span>
+                                    </label>
+                        </div>
+
+                        <div class="form__radio-group">
+                            <input type="radio" class="form__radio-input" id="large" name="size">
+
+                            <label for="large" class="form__radio-label">
+                                        <span class="form__radio-button lower"></span>   
+                                        Lower Contour<br><span class="direction">(Seaward)</span>
+
+
+                                    </label>
+                        </div>
+
+                    </div>
+                    <div class="table">
+                        <table id="t01">
+                            <tr>
+                                <th>ID</th>
+                                <th>Elevation(ft)</th>
+                                <th>Distance(ft-POB)</th>
+                            </tr>
+                            <tr>
+                                <td>12344</td>
+                                <td>10</td>
+                                <td>50.014</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                <td>99</td>
+                                <td>-</td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+                    <!-- <div class="slidecontainer">
+                            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                        </div> -->
+                    <div class="button-box">
+                        <button class="button-box__calc">Calculate</button>
+                        <button class="button-box__reset">Reset</button>
+                    </div>
+                    <div class="results">
+                        <div class="results-text">Results(yds)<sup>3</sup> : <span></span></div>
+                    </div>
+
+
+                    <!-- </div> -->
                 </div>
 
             </div>
@@ -127,7 +203,7 @@
 
 
                     </div>
-                    <div class="graph"></div>
+                    <div class="graph" id="graph"></div>
 
                 </div>
 
